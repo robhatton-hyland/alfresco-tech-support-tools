@@ -2,7 +2,7 @@
 #
 services:
   process:
-    image: alfresco/process-services:2.3.7.3
+    image: alfresco/process-services:2.3.10
     hostname: process
     environment:
       ACTIVITI_DATASOURCE_USERNAME: alfresco
@@ -38,7 +38,7 @@ services:
         condition: service_healthy
       
   process-admin:
-    image: alfresco/process-services-admin:2.3.7.3
+    image: alfresco/process-services-admin:2.3.10
     hostname: process-admin
     environment:
       ACTIVITI_ADMIN_REST_APP_HOST: http://process
