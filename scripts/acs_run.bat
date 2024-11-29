@@ -5,32 +5,29 @@ set checkdockerrunningcount=0
 set isdockerrunning=0
 set filename=""
 set projectname=""
-set displayName=""
-set ACS="ACS v"
-
 
 :
 :: Read in files
-for /f "delims=" %%x in ('dir /b /ogd .\KB-Support\*.yml') do (
+for /f "delims=" %%x in ('dir /b /ogd .\ACS\KB-Support\*.yml') do (
     set /a count=count+1
     set choice[!count!]=%%x
-	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=!displayChoice[%%y]:-docker-compose.yml=%!" 
-    for %%y in (!count!) do echo !choice[%%y]! & set "choice[%%y]=KB-Support\!choice[%%y]:%cd%\=!"
+	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=ACS v!displayChoice[%%y]:-docker-compose.yml=%!" & set "displayChoice[%%y]=!displayChoice[%%! **KB-Support**"
+    for %%y in (!count!) do set "choice[%%y]=KB-Support\!choice[%%y]:%cd%\=!"
 	
 )
 
-for /f "delims=" %%x in ('dir /b /ogd .\Limited-Support\*.yml') do (
+for /f "delims=" %%x in ('dir /b /ogd .\ACS\Limited-Support\*.yml') do (
     set /a count=count+1
     set choice[!count!]=%%x
-	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=!displayChoice[%%y]:-docker-compose.yml=%!"
-    for %%y in (!count!) do echo !choice[%%y]! & set "choice[%%y]=Limited-Support\!choice[%%y]:%cd%\=!"
+	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=ACS v!displayChoice[%%y]:-docker-compose.yml=%!" & set "displayChoice[%%y]=!displayChoice[%%! **Limited-Support**"
+    for %%y in (!count!) do set "choice[%%y]=Limited-Support\!choice[%%y]:%cd%\=!"
 )
 
-for /f "delims=" %%x in ('dir /b /ogd *.yml') do (
+for /f "delims=" %%x in ('dir /b /ogd .\ACS\*.yml') do (
     set /a count=count+1
     set choice[!count!]=%%x
-	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=!displayChoice[%%y]:-docker-compose.yml=%!"
-    for %%y in (!count!) do echo !choice[%%y]! & set "choice[%%y]=!choice[%%y]:%cd%\=!"
+	for %%y in (!count!) do set "displayChoice[%%y]=!choice[%%y]:%cd%\=!" & set "displayChoice[%%y]=ACS v!displayChoice[%%y]:-docker-compose.yml=%!"
+    for %%y in (!count!) do set "choice[%%y]=!choice[%%y]:%cd%\=!"
 )
 
 :listYML
@@ -42,8 +39,9 @@ echo Found !count! Docker Compose Environments:
 echo.
 for /l %%x in (1,1,!count!) do (
      ::echo  [%%x] !choice[%%x]!
-	 echo  [%%x] ACS v!displayChoice[%%x]!
+	 echo  [%%x] !displayChoice[%%x]!
 )
+echo.
 echo  [q] quit
 echo.
 :: Retrieve User input
@@ -92,6 +90,7 @@ docker --log-level error compose -f !choice[%select%]! build --no-cache
 echo Starting !projectname!
 docker --log-level error compose -f !choice[%select%]! -p !projectname! up -d
 echo.
+echo Waiting for ACS v!displayChoice[%select%]! to complete start up
 timeout 30 /nobreak
 echo ACS v!displayChoice[%select%]! should now be running.
 echo.
