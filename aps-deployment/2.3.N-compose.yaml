@@ -1,0 +1,101 @@
+# This Docker Compose file will spin up an APS on a local host.
+#
+services:
+  process:
+    image: alfresco/process-services:2.3.7.3
+    hostname: process
+    environment:
+      ACTIVITI_DATASOURCE_USERNAME: alfresco
+      ACTIVITI_DATASOURCE_PASSWORD: alfresco
+      ACTIVITI_DATASOURCE_DRIVER: org.postgresql.Driver
+      ACTIVITI_HIBERNATE_DIALECT: org.hibernate.dialect.PostgreSQLDialect
+      ACTIVITI_DATASOURCE_URL: "jdbc:postgresql://postgres-process:5432/activiti?characterEncoding=UTF-8"
+      ACTIVITI_CSRF_DISABLED: "true"
+      ACTIVITI_CORS_ENABLED: "false"
+      ACTIVITI_ES_SERVER_TYPE: rest
+      ACTIVITI_ES_REST_CLIENT_ADDRESS: elasticsearch
+      ACTIVITI_ES_REST_CLIENT_PORT: 9200
+      ACTIVITI_ES_REST_CLIENT_SCHEMA: http
+      ACTIVITI_ES_REST_CLIENT_AUTH_ENABLED: false
+      ACTIVITI_ES_REST_CLIENT_USERNAME: admin
+      ACTIVITI_ES_REST_CLIENT_PASSWORD: esadmin
+      JAVA_OPTS: " -Xms256m -Xmx1g"
+    volumes:
+     - ./Aspose.Total.Java.lic:/home/alfresco/.activiti/enterprise-license/Aspose.Total.Java.lic
+     - ./whitelisted-scripts.conf:/usr/local/tomcat/webapps/activiti-app/WEB-INF/classes/activiti/whitelisted-scripts.conf
+    ports:
+      - 8080:8080
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/activiti-app"]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+      start_period: 1m
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      postgres-process:
+        condition: service_healthy
+      
+  process-admin:
+    image: alfresco/process-services-admin:2.3.7.3
+    hostname: process-admin
+    environment:
+      ACTIVITI_ADMIN_REST_APP_HOST: http://process
+      ACTIVITI_ADMIN_REST_APP_PORT: 8080
+      JAVA_OPTS: " -Xms256m -Xmx1g"
+    ports:
+      - 8181:8080
+    depends_on:
+      process:
+        condition: service_healthy
+
+  elasticsearch:
+    image: elasticsearch:7.17.6
+    hostname: elasticsearch
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    ports:
+      - 9300:9300
+      - 9200:9200
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -X GET http://localhost:9200/_cluster/health?pretty | grep status | grep -q '\\(green\\|yellow\\)'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+      
+  kibana:
+    image: kibana:7.17.6
+    mem_limit: 1g
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-o", "/dev/null", "http://localhost:5601/status"]
+      interval: 10s
+      timeout: 2s
+      retries: 5
+      start_period: 30s
+      
+  postgres-process:
+    image: postgres:13.1
+    mem_limit: 512m
+    environment:
+      - POSTGRES_PASSWORD=alfresco
+      - POSTGRES_USER=alfresco
+      - POSTGRES_DB=activiti
+    command: postgres -c max_connections=300 -c log_min_messages=LOG
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
