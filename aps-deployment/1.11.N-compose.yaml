@@ -1,5 +1,5 @@
 # This Docker Compose file will spin up an APS on a local host.
-#
+# 
 services:
   process:
     image: alfresco/process-services:1.11.5
