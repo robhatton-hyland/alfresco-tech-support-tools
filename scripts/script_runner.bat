@@ -39,8 +39,9 @@ echo.
    echo  [2] APS
    echo  [q] quit
 echo.
+echo Selection Invalid.
 
 :: Retrieve User input
 set /p select=Please pick from above:
 echo.
-GOTO :validateSelection
+GOTO validateSelection
