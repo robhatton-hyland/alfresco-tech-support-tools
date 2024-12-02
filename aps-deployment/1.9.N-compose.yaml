@@ -12,13 +12,6 @@ services:
       ACTIVITI_DATASOURCE_URL: "jdbc:postgresql://postgres-process:5432/activiti?characterEncoding=UTF-8"
       ACTIVITI_CSRF_DISABLED: "true"
       ACTIVITI_CORS_ENABLED: "false"
-      ACTIVITI_ES_SERVER_TYPE: rest
-      ACTIVITI_ES_REST_CLIENT_ADDRESS: elasticsearch
-      ACTIVITI_ES_REST_CLIENT_PORT: 9200
-      ACTIVITI_ES_REST_CLIENT_SCHEMA: http
-      ACTIVITI_ES_REST_CLIENT_AUTH_ENABLED: false
-      ACTIVITI_ES_REST_CLIENT_USERNAME: admin
-      ACTIVITI_ES_REST_CLIENT_PASSWORD: esadmin
       JAVA_OPTS: " -Xms256m -Xmx1g"
     ports:
       - 8080:8080
@@ -51,8 +44,7 @@ services:
     image: elasticsearch:5.5.0
     hostname: elasticsearch
     environment:
-      - xpack.security.enabled=false
-      - discovery.type=single-node
+      discovery.type: single-node
     ports:
       - 9300:9300
       - 9200:9200
