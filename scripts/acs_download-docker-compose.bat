@@ -2,10 +2,11 @@
 
 echo Deleting previous Docker Compose Files
 
-del /q /f "*.yml"
+::del /q /f "./ACS/*.yml"
 
-rmdir /S /Q "./ACS/KB-Support"
-rmdir /S /Q "./ACS/Limited-Support"
+rmdir /S /Q "./ACS"
+::rmdir /S /Q "./ACS/KB-Support"
+::rmdir /S /Q "./ACS/Limited-Support"
 echo Downloading Docker Compose Files
 
 mkdir "ACS"
