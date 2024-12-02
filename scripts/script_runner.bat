@@ -8,7 +8,7 @@ call script_downloader.bat
 
 :listMenu
 echo.
-	 echo  [1] ACS
+   echo  [1] ACS
    echo  [2] APS
 echo.
    echo  [q] quit
