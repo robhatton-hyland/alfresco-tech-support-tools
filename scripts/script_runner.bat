@@ -5,6 +5,7 @@ powershell -Command "Invoke-WebRequest https://raw.githubusercontent.com/robhatt
 echo Downloaded script_downloader.bat
 
 call script_downloader.bat
+cls
 
 :listMenu
 echo.
