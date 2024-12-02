@@ -11,7 +11,6 @@ cls
 echo.
    echo  [1] ACS
    echo  [2] APS
-echo.
    echo  [q] quit
 echo.
 
@@ -25,6 +24,7 @@ IF %select% EQU q GOTO :EOF
 IF %select% EQU Q GOTO :EOF
 IF %select% EQU 0 GOTO listMenuError
 SET /A UserInputVal="%select%"*1
+IF %UserInputVal% GTR 2 goto listMenuError
 IF %UserInputVal% GTR 0 ( IF %UserInputVal% LEQ 2 ( goto Run ) )
 IF %UserInputVal% EQU 0 goto listMenuError
 
@@ -33,10 +33,10 @@ IF %select% EQU 1 ( call acs_download-docker-compose.bat & echo. & call acs_run.
 IF %select% EQU 1 ( call aps_download-docker-compose.bat & echo. & call aps_run.bat) 
 
 :listMenuError
+cls
 echo.
-	 echo  [1] ACS
+   echo  [1] ACS
    echo  [2] APS
-echo.
    echo  [q] quit
 echo.
 
