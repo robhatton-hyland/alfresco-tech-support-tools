@@ -44,4 +44,4 @@ echo Selection Invalid.
 :: Retrieve User input
 set /p select=Please pick from above:
 echo.
-GOTO validateSelection
+GOTO :validateSelection
