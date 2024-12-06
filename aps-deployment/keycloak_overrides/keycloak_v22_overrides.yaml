@@ -1,0 +1,60 @@
+services:
+  process:
+    environment:
+      IDENTITY_SERVICE_ENABLED: "true"
+      IDENTITY_SERVICE_REALM: "alfresco"
+      IDENTITY_SERVICE_SSL_REQUIRED: "none"
+      IDENTITY_SERVICE_RESOURCE: "alfresco"
+      IDENTITY_SERVICE_PRINCIPAL_ATTRIBUTE: "email"
+      IDENTITY_SERVICE_ALWAYS_REFRESH_TOKEN: "true"
+      IDENTITY_SERVICE_AUTODETECT_BEARER_ONLY: "true"
+      IDENTITY_SERVICE_TOKEN_STORE: "session"
+      IDENTITY_SERVICE_ENABLE_BASIC_AUTH: "true"
+      IDENTITY_SERVICE_PUBLIC_CLIENT: "false"
+      IDENTITY_SERVICE_AUTH: http://host.docker.internal:8999/auth
+      IDENTITY_SERVICE_USE_BROWSER_BASED_LOGOUT: "true"
+
+  keycloak:
+    image: keycloak/keycloak:22.0
+    mem_limit: 2048m
+    healthcheck:
+        test: ["CMD", "curl", "--head", "-fsS", "http://localhost:8080/auth/health/ready"]
+        interval: 10s
+        timeout: 5s
+        retries: 50
+    restart: always
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+      - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+      - KC_DB_URL=jdbc:postgresql://postgres-keycloak:5432/keycloak
+      - KC_HTTP_RELATIVE_PATH=/auth
+      - KC_HOSTNAME_STRICT_HTTPS=false
+    command: "        start --import-realm --proxy edge --hostname host.docker.internal:8081 --http-enabled=true --hostname-strict=false --health-enabled=true --metrics-enabled=true "
+    depends_on:
+      postgres-keycloak:
+        condition: service_healthy
+    volumes:
+      - ./alfresco-realm_v22.json:/opt/keycloak/data/import/alfresco-realm.json
+      - ./alfresco-theme/:/opt/keycloak/themes/alfresco/
+    ports:
+      - "8999:8080"
+
+  postgres-keycloak:
+    image: postgres:13.1
+    mem_limit: 512m
+    environment:
+      - POSTGRES_PASSWORD=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_DB=keycloak
+    command: postgres -c max_connections=300 -c log_min_messages=LOG
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $$POSTGRES_DB -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
