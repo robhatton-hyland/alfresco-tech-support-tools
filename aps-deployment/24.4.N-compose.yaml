@@ -35,7 +35,7 @@ services:
         condition: service_healthy
       
   process-admin:
-    image: alfresco/process-services-admin:24.2.0
+    image: alfresco/process-services-admin:24.4.0
     hostname: process-admin
     environment:
       ACTIVITI_ADMIN_REST_APP_HOST: http://process
