@@ -87,7 +87,7 @@ services:
       - POSTGRES_PASSWORD=alfresco
       - POSTGRES_USER=alfresco
       - POSTGRES_DB=activiti
-      - POSTGRES_INITDB_ARGS="--auth-host=scram-sha-256 --auth-local=trust"
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256 --auth-local=trust
     command: postgres -c max_connections=300 -c log_min_messages=LOG
     ports:
       - "5432:5432"
